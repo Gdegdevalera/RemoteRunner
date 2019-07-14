@@ -1,5 +1,37 @@
 ﻿@page "/"
+@using RemoteRunner.Services
+@inject ScriptService ScriptService
+@inject IJSRuntime JsRuntime
+@inject IUriHelper UriHelper
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<button class="btn btn-primary" @onclick="@Action">Click me</button>
+<button class="btn btn-primary" @onclick="@Logout">Logout</button>
+
+@foreach (var line in lines)
+{
+    <p>@line</p>
+}
+
+@code {
+    List<string> lines = new List<string>();
+        
+    async Task Action()
+    {
+        var token = await JsRuntime.InvokeAsync<string>("blazorExtensions.ReadToken");
+
+        if(string.IsNullOrWhiteSpace(token))
+            UriHelper.NavigateTo("/login");
+
+        foreach(var line in ScriptService.Run(token, "test"))
+        {
+            lines.Add(line);
+        }
+    }
+
+    async Task Logout()
+    {
+        await JsRuntime.InvokeAsync<string>("blazorExtensions.DeleteToken");
+        UriHelper.NavigateTo("/login");
+    }
+}

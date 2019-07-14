@@ -1,0 +1,37 @@
+@page "/login"
+@using RemoteRunner.Services
+@inject LoginService LoginService
+@inject IJSRuntime JsRuntime
+@inject IUriHelper UriHelper
+
+<input type="text" name="username" placeholder="Username" @bind="username" />
+<input type="password" name="password" placeholder="Password" @bind="password"/>
+
+<button @onclick="@SignIn">Login</button>
+
+@code {
+    string username;
+    string password;
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        var token = await JsRuntime.InvokeAsync<string>("blazorExtensions.ReadToken");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            UriHelper.NavigateTo("/");
+        }
+    }
+
+    async void SignIn()
+    {
+        var token = LoginService.Login(username, password);
+
+        if (token != null)
+        {
+            await JsRuntime.InvokeAsync<string>("blazorExtensions.SaveToken", token);
+
+            UriHelper.NavigateTo("/");
+        }
+    }
+}

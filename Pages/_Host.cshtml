@@ -14,6 +14,37 @@
 <body>
     <app>@(await Html.RenderComponentAsync<App>())</app>
 
-    <script src="_framework/blazor.server.js"></script>
+<script src="_framework/blazor.server.js"></script>
+<script>
+window.blazorExtensions = {
+
+    SaveToken: function (value) {
+        var date = new Date();
+        date.setTime(date.getTime() + (3 * 60 * 60 * 1000)); // 3 hours
+        document.cookie = "token=" + value + "; expires=" + date.toGMTString() + "; path=/";
+    },
+    
+    ReadToken: function () {
+        
+        var name = "token=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+              c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+            }
+        }
+        return '';
+    },
+    
+    DeleteToken: function() {
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    }
+}
+</script>
 </body>
 </html>
