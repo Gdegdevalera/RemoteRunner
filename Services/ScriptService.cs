@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -31,9 +32,34 @@ namespace RemoteRunner.Services
                 yield return "Script has not found!";
                 yield break;
             }
-            
-            yield return script.Name;
-            yield return script.Command;
+
+            using(var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = script.FileName,
+                    Arguments = script.Arguments,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            })
+            {
+                process.Start();
+                
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    yield return process.StandardOutput.ReadLine();
+                }
+                
+                while (!process.StandardError.EndOfStream)
+                {
+                    yield return process.StandardError.ReadLine();
+                }
+     
+                process.WaitForExit();
+            }
         }
 
         private static bool ValidateToken(string token)
@@ -68,7 +94,8 @@ namespace RemoteRunner.Services
         private class Script
         {
             public string Name { get; set; }
-            public string Command { get; set; }
+            public string FileName { get; set; }
+            public string Arguments { get; set; }
         }
     }
 }
