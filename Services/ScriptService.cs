@@ -38,6 +38,7 @@ namespace RemoteRunner.Services
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = script.FileName,
+                    WorkingDirectory = script.WorkingDirectory,
                     Arguments = script.Arguments,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -96,6 +97,7 @@ namespace RemoteRunner.Services
             public string Name { get; set; }
             public string FileName { get; set; }
             public string Arguments { get; set; }
+            public string WorkingDirectory { get; set; }
         }
     }
 }
