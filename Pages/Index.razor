@@ -4,7 +4,10 @@
 @inject IJSRuntime JsRuntime
 @inject IUriHelper UriHelper
 
-<button class="btn btn-primary" @onclick="@Action">Click me</button>
+@foreach(var scriptName in ScriptService.Scripts())
+{
+<button class="btn btn-primary" @onclick="@(() => Run(scriptName))">@scriptName</button>
+}
 <button class="btn btn-primary" @onclick="@Logout">Logout</button>
 <p>
 @foreach (var line in lines)
@@ -16,14 +19,14 @@
 @code {
     List<string> lines = new List<string>();
         
-    async Task Action()
+    async Task Run(string scriptName)
     {
         var token = await JsRuntime.InvokeAsync<string>("blazorExtensions.ReadToken");
 
         if(string.IsNullOrWhiteSpace(token))
             UriHelper.NavigateTo("/login");
 
-        foreach(var line in ScriptService.Run(token, "test"))
+        foreach(var line in ScriptService.Run(token, scriptName))
         {
             lines.Add(line);
         }

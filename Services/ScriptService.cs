@@ -14,6 +14,8 @@ namespace RemoteRunner.Services
         {
             _scripts = configuration.GetSection("Scripts").Get<Script[]>();
         }
+
+        public IEnumerable<string> Scripts() => _scripts.Select(x => x.Name);
         
         public IEnumerable<string> Run(string token, string scriptName)
         {
