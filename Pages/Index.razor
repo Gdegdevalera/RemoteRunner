@@ -4,14 +4,14 @@
 @inject IJSRuntime JsRuntime
 @inject IUriHelper UriHelper
 
-
 <button class="btn btn-primary" @onclick="@Action">Click me</button>
 <button class="btn btn-primary" @onclick="@Logout">Logout</button>
-
+<p>
 @foreach (var line in lines)
 {
-    <p>@line</p>
+    @line<br>
 }
+</p>
 
 @code {
     List<string> lines = new List<string>();
